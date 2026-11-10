@@ -178,16 +178,17 @@ impl Ramdisk {
         self.insert(name, S_IFREG | mode, data)
     }
 
-    /// Point `name` to `target`: a link already there is pointed anew, and
-    /// otherwise a root-owned link is added, creating missing parent
-    /// directories.
+    /// Point `name` to `target`: a link already there is pointed anew, a file
+    /// that stands there is replaced by a link, and otherwise a root-owned link
+    /// is added, creating missing parent directories. A stock ramdisk may carry
+    /// a command the recovery also provides as a file of its own.
     pub fn link(&mut self, name: &str, target: &str) -> Result<()> {
         match self.entries.iter_mut().find(|e| e.name == name) {
-            Some(e) if e.mode & S_IFMT == S_IFLNK => {
+            Some(e) => {
+                e.mode = S_IFLNK | LINK_MODE;
                 e.data = target.as_bytes().to_vec();
                 Ok(())
             }
-            Some(_) => bail!("{name} is in the ramdisk and is not a link"),
             None => self.insert(name, S_IFLNK | LINK_MODE, target.as_bytes().to_vec()),
         }
     }
