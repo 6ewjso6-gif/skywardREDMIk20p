@@ -36,11 +36,8 @@ MIUI fastboot 包的 `images/recovery.img` 里，而卡刷包里它排在数 GB 
 
 放到本仓库的 `stock/recovery.img` 即可，不需要改名或转换。
 
-如果手上只有卡刷包（`.zip`），也可以让打包器自己从包里切出 recovery 分区：
-
-```sh
-target/release/skyward-pack stock --config devices/raphael.toml --out stock/recovery.img
-```
+> 卡刷包（`.zip`）用不了：里面没有 `payload.bin`，recovery 分区又排在
+> `system.img` 后面，打包器只处理带 payload 的完整 OTA 包。
 
 ## 从源码构建
 
@@ -52,6 +49,8 @@ cargo install cargo-ndk
 export NDK_HOME=$HOME/Android/Sdk/ndk/29.0.14206865   # 换成你的 NDK 路径
 ./scripts/build.sh
 ```
+
+构建前先把原厂 `recovery.img` 放到 `stock/recovery.img`（见上一节）。
 
 产物在 `out/skyward-raphael.img`（128 MiB 整分区镜像），脚本最后打印大小和
 SHA-256。刷入：
