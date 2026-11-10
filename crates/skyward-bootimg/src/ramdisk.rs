@@ -192,6 +192,15 @@ impl Ramdisk {
         }
     }
 
+    /// Drop every entry under `prefix`, as a stock UI's own pictures are
+    /// dropped where Skyward draws the screens instead. Returns how many
+    /// entries went.
+    pub fn remove_tree(&mut self, prefix: &str) -> usize {
+        let before = self.entries.len();
+        self.entries.retain(|e| !e.name.starts_with(prefix));
+        before - self.entries.len()
+    }
+
     fn insert(&mut self, name: &str, mode: u32, data: Vec<u8>) -> Result<()> {
         if self.find(name).is_some() {
             bail!("{name} is already in the ramdisk");

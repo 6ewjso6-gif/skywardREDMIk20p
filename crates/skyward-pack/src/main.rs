@@ -137,6 +137,9 @@ fn main() -> Result<()> {
                 );
             };
             rd.replace(recovery, read(&binary)?)?;
+            // The pictures under res/ are the stock UI's, and Skyward draws its
+            // own: a phone with a 64 MiB recovery partition has no room for both.
+            rd.remove_tree("res/images/");
             // Install scripts look for the commands a stock recovery lacks
             // among its programs, and its unzip there too, a link to ziptool
             // until it points here; the recovery binary is each of them.

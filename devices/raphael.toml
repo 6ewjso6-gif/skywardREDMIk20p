@@ -30,5 +30,14 @@ mounted = ["system"]
 [backup]
 efs = ["modemst1", "modemst2", "fsg", "fsc", "persist"]
 
+# The MIUI build the recovery is made on. Its recovery partition is not in the
+# recovery package, which carries no payload, but in images/recovery.img of the
+# fastboot package; the hash is of that image.
+[stock]
+version = "V12.5.6.0.RFKCNXM"
+package = "https://cdnorg.d.miui.com/V12.5.6.0.RFKCNXM/raphael_images_V12.5.6.0.RFKCNXM_20211025.0000.00_11.0_cn_b9074ff524.tgz"
+recovery = "4f75a633c527229d5b71603429880a595bbdb1b90ebb2eb5f94f834dd0a2a90d"
+partition_size = 67108864
+
 [update]
 server = "https://update.miui.com/updates/miotaV3.php"

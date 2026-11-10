@@ -11,8 +11,9 @@ cd "$(dirname "$0")/.."
 DEVICE=raphael
 # Android 9 起才有的接口够用，再高的平台版本对这台机器没有意义。
 API=28
-# recovery 分区大小，原厂镜像没有 AVB footer 时打包器需要它。
-PARTITION_SIZE=134217728
+# recovery 分区只有 64 MiB：kernel 占 42 MiB，ramdisk 只剩 22 MiB。
+
+PARTITION_SIZE=67108864
 
 STOCK=${STOCK:-stock/recovery.img}
 OUT=${OUT:-out/skyward-$DEVICE.img}
@@ -47,16 +48,24 @@ fi
 
 echo "==> 打包镜像"
 mkdir -p "$(dirname "$OUT")"
-target/release/skyward-pack recovery \
-  --stock "$STOCK" \
-  --binary target/aarch64-linux-android/release/skyward \
-  --system-init target/system-init/aarch64-linux-android/release/system-init \
-  --config "devices/$DEVICE.toml" \
-  --font resources/fonts/MiSansVF.ttf \
-  --mono resources/fonts/KirkMono-Regular.ttf \
-  --mono-license resources/fonts/KirkMono-OFL.txt \
-  --partition-size "$PARTITION_SIZE" \
-  --out "$OUT"
+pack() {
+  target/release/skyward-pack recovery \
+    --stock "$STOCK" \
+    --binary target/aarch64-linux-android/release/skyward \
+    --system-init target/system-init/aarch64-linux-android/release/system-init \
+    --config "devices/$DEVICE.toml" \
+    --font "$1" \
+    --mono resources/fonts/KirkMono-Regular.ttf \
+    --mono-license resources/fonts/KirkMono-OFL.txt \
+    --partition-size "$PARTITION_SIZE" \
+    --out "$OUT"
+}
+
+# 20 MiB 的完整字重和 42 MiB 的内核挤不进 64 MiB 分区，换成常用字符的子集。
+if ! pack resources/fonts/MiSansVF.ttf; then
+  echo "==> 完整字体放不下，改压子集字体"
+  pack "$(./scripts/subset-font.sh | tail -1)"
+fi
 
 echo
 echo "完成：$OUT（$(stat -c%s "$OUT") 字节）"
