@@ -436,8 +436,17 @@ mod tests {
         assert_eq!((zstd.mode, zstd.data.as_slice()), (S_IFLNK | LINK_MODE, b"recovery".as_slice()));
         assert_eq!((zstd.uid, zstd.gid, zstd.nlink), (0, 0, 1));
         assert!(back.find("sbin").is_some_and(Entry::is_dir), "a missing folder is made");
-        assert!(rd.link("system/bin/recovery", "zstd").is_err(), "a file is no link to point anew");
         assert!(rd.link("system/bin/recovery/7za", "recovery").is_err(), "a file holds no links");
+    }
+
+    #[test]
+    fn a_file_where_a_link_goes_is_replaced_by_one() {
+        let mut rd = Ramdisk::new();
+        rd.add("system/bin/recovery", 0o750, b"binary".to_vec()).unwrap();
+        rd.add("system/bin/unzip", 0o755, b"a copy of its own".to_vec()).unwrap();
+        rd.link("system/bin/unzip", "recovery").unwrap();
+        let unzip = rd.find("system/bin/unzip").unwrap();
+        assert_eq!((unzip.mode, unzip.data.as_slice()), (S_IFLNK | LINK_MODE, b"recovery".as_slice()), "the stock copy becomes the link");
     }
 
     /// An entry owned by whoever runs the tests, who can give it that owner.
