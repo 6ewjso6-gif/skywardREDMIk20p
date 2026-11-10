@@ -38,8 +38,9 @@ if [ ! -f "$STOCK" ]; then
   echo "==> 取原厂 recovery（只读卡刷包里 recovery 分区那一段）"
   mkdir -p "$(dirname "$STOCK")"
   if ! target/release/skyward-pack stock --config "devices/$DEVICE.toml" --out "$STOCK"; then
-    echo "无法自动获取原厂 recovery。请把 fastboot 包里的 images/recovery.img" >&2
-    echo "放到 $STOCK，或用 STOCK=... 指定路径后重试。" >&2
+    echo "无法自动获取原厂 recovery：这台机器的卡刷包里没有 payload.bin。" >&2
+    echo "请把 fastboot 包的 images/recovery.img 放到 $STOCK，" >&2
+    echo "或用 STOCK=... 指定路径后重试。" >&2
     exit 1
   fi
 fi

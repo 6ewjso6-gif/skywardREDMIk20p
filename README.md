@@ -66,21 +66,11 @@ fastboot reboot recovery
 
 > 需要先解 BL 锁。刷入会覆盖原厂 recovery，MIUI 系统更新可能把它换回去。
 
-## 让 CI 自动出包
+## CI
 
-`devices/raphael.toml` 里补上 `[stock]` 段后，push 或打 `v*` tag 就会自动构建：
-
-```toml
-[stock]
-# MIUI 版本号，会写进镜像名
-version = "V12.5.6.0.RFKCNXM"
-# 卡刷包直链，打包器只读 recovery 分区那一段
-package = "https://bigota.d.miui.com/<版本>/<包名>.zip"
-# 卡刷包里 recovery 分区的 SHA-256，用来校验取出来的镜像
-recovery = "<64 位十六进制>"
-# recovery 分区大小；原厂镜像没有 AVB footer 时必须给
-partition_size = 134217728
-```
+`.github/workflows/build.yml` 在每次 push 时跑 clippy、测试，并用 NDK 编译设备端
+二进制，证明代码对这台机器编得过。它不产出镜像：原厂 recovery 不在这台机器的
+卡刷包 payload 里，自动取不到，镜像用 `scripts/build.sh` 在本地构建。
 
 ## 这个移植改了什么
 

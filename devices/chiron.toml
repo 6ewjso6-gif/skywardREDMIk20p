@@ -1,0 +1,41 @@
+[device]
+codename = "chiron"
+brand = "Xiaomi"
+model = "Xiaomi Mi MIX 2"
+# A-only: one boot and one recovery partition, and no dynamic partitions.
+ab = false
+soc = { hans = "骁龙®835移动平台", hant = "Snapdragon® 835 行動平台", en = "Snapdragon® 835 Mobile Platform" }
+os_version_prop = "ro.build.version.incremental"
+
+[display]
+# 5.99 inches, 18:9, as the panel reports itself.
+width = 1080
+height = 2160
+density = 420
+diagonal = 5.99
+
+# Android 8 keeps its kernel modules in the vendor partition, in
+# /vendor/lib/modules, the only place the stock recovery loads them from.
+[modules]
+sources = ["vendor"]
+
+# The recovery runs from the ramdisk, so the system partition is free to
+# be mounted where the phone's own table puts it: its build properties say
+# which system is installed, and the file manager browses it.
+[partitions]
+mounted = ["system"]
+
+# The baseband's settings and the sensors' calibration, as every Xiaomi
+# phone of this generation keeps them.
+[backup]
+efs = ["modemst1", "modemst2", "fsg", "fsc", "persist"]
+
+# The MIUI build the recovery is made on, and the package it comes from.
+[stock]
+version = "V12.0.1.0.PDECNXM"
+package = "https://bigota.d.miui.com/V12.0.1.0.PDECNXM/miui_MIMIX2_V12.0.1.0.PDECNXM_ba60e4bd60_9.0.zip"
+recovery = "514efae2d1d1caedf05d2f628aebb57268a89aa630ac4b7e037ee2a94ed7abf2"
+partition_size = 67108864
+
+[update]
+server = "https://update.miui.com/updates/miotaV3.php"
